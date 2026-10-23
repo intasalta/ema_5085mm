@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estación Meteorológica ........ - INTA</title>
+  <title>Estación Meteorológica ....... - INTA</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -271,7 +271,7 @@
         <div class="mt-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
           <div class="flex items-center justify-between mb-2">
             <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <i data-feather="cloud-drizzle" class="h-3.5 w-3.5 text-sky-500"></i> Lluvia Horaria (mm)
+              <i data-feather="cloud-drizzle" class="h-3.5 w-3.5 text-sky-500"></i> Lluvia Horaria (mm/hr)
             </span>
             <span id="badge-rain-val" class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold font-mono">--</span>
           </div>
@@ -563,35 +563,29 @@
           });
           return rowObj;
         }).map(r => {
-          const dateTime = r['Time'] || r['Fecha / Hora'] || Object.values(r)[0] || '';
+          const dateTime = r['Unnamed: 0'] || r['Time'] || Object.values(r)[0] || '';
           const parts = dateTime.split(' ');
           const timeFull = parts[1] || '';
           const timeShort = timeFull ? timeFull.substring(0, 5) : '';
 
-          // Buscamos columnas de manera flexible
-          const findVal = (keyword) => {
-            for (let key in r) {
-              if (key.toLowerCase().includes(keyword.toLowerCase())) {
-                const val = parseFloat(r[key]);
-                return isNaN(val) ? 0 : val;
-              }
-            }
-            return 0;
+          const getColNum = (name) => {
+            const val = parseFloat(r[name]);
+            return isNaN(val) ? 0 : val;
           };
 
           return {
             dateTime,
             timeStr: timeShort,
-            temp: findVal('Temperature(℃)') || findVal('Temperatura'),
-            dew: findVal('Dew Point(℃)') || findVal('Rocío'),
-            hum: findVal('Humidity(%)') || findVal('Humedad'),
-            solar: findVal('Solar(W/m²)'),
-            rain: findVal('Rain Rate') || findVal('Hourly'),
-            rainDaily: findVal('Daily(mm)'),
-            rainWeekly: findVal('Weekly(mm)'),
-            windSpeed: findVal('Wind Speed'),
-            windGust: findVal('Wind Gust'),
-            windDir: findVal('Wind Direction')
+            temp: getColNum('Temperature(℃)'),
+            dew: getColNum('Dew Point(℃)'),
+            hum: getColNum('Humidity(%)'),
+            solar: getColNum('Solar(W/m²)'),
+            rainRate: getColNum('Rain Rate(mm/hr)'),
+            rainDaily: getColNum('Daily(mm)'),
+            rainWeekly: getColNum('Weekly(mm)'),
+            windSpeed: getColNum('Wind Speed(km/h)'),
+            windGust: getColNum('Wind Gust(km/h)'),
+            windDir: getColNum('Wind Direction(º)')
           };
         }).filter(r => r.dateTime !== '');
 
@@ -626,12 +620,12 @@
     function getDatosFiltrados() {
       if (!datosEstacion || datosEstacion.length === 0) return [];
       const sliceCount = Math.min(limiteRegistros, datosEstacion.length);
-      return datosEstacion.slice(0, sliceCount).reverse();
+      return datosEstacion.slice(datosEstacion.length - sliceCount);
     }
 
     function actualizarTarjetas() {
       if (!datosEstacion || datosEstacion.length === 0) return;
-      const latest = datosEstacion[0];
+      const latest = datosEstacion[datosEstacion.length - 1];
 
       const lblFecha = document.getElementById('label-ultima-fecha');
       if (lblFecha && latest.dateTime) {
@@ -641,7 +635,7 @@
       const cardTemp = document.getElementById('card-temp-actual');
       if (cardTemp) cardTemp.innerHTML = `${latest.temp.toFixed(1)}<span>°C</span>`;
 
-      const ultimos24 = datosEstacion.slice(0, Math.min(24, datosEstacion.length));
+      const ultimos24 = datosEstacion.slice(Math.max(0, datosEstacion.length - 24));
       const temps = ultimos24.map(r => r.temp);
       if (temps.length > 0) {
         document.getElementById('table-temp-min').innerText = `${Math.min(...temps).toFixed(1)}°C`;
@@ -838,11 +832,11 @@
       if (!ctx) return;
       const { textColor, gridColor } = getChartColors();
       const labels = rows.map(r => r.timeStr);
-      const rains = rows.map(r => r.rain || 0);
+      const rains = rows.map(r => r.rainRate || 0);
 
       const totalPeriodo = rains.reduce((a, b) => a + b, 0);
       const badge = document.getElementById('badge-rain-val');
-      if (badge) badge.innerText = `${totalPeriodo.toFixed(1)} mm`;
+      if (badge) badge.innerText = `${totalPeriodo.toFixed(1)} mm/hr`;
 
       if (chartLluvia) chartLluvia.destroy();
       chartLluvia = new Chart(ctx, {
@@ -850,7 +844,7 @@
         data: {
           labels,
           datasets: [{
-            label: 'Lluvia (mm)',
+            label: 'Lluvia (mm/hr)',
             data: rains,
             backgroundColor: 'rgba(14, 165, 233, 0.8)',
             borderColor: '#0284c7',
