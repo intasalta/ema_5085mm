@@ -682,7 +682,10 @@
         <a href="https://www.argentina.gob.ar/economia/agricultura-ganaderia-y-pesca" target="_blank" rel="noopener">
           <img src="MECON-Agricultura-BLANCO.png" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/intasalta/emas/main/MECON-Agricultura-BLANCO.png';" alt="Secretaría de Bioeconomía" class="h-16 md:h-20 w-auto opacity-90 hover:opacity-100 transition">
         </a>
-      </div>      
+      </div>
+      <p class="text-xs text-slate-400">
+        Red de Monitoreo Agroclimático • INTA Salta & Colegio Secundario N° 5085 "Dr. Mariano Moreno"
+      </p>
     </div>
   </footer>
 
@@ -753,7 +756,7 @@
     infoModal.addEventListener('click', (e) => { if (e.target === infoModal) closeModal(); });
 
     // =========================================================================
-    // 4. PARSER DE CSV
+    // 4. PARSER DE CSV DINÁMICO (DETECTA COLUMNAS POR ENCABEZADO)
     // =========================================================================
     function parseCSV(text) {
       if (!text) return [];
@@ -762,6 +765,48 @@
       }
       const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (rawLines.length < 3) return [];
+
+      const h0 = rawLines[0].split(',').map(s => s.trim().toLowerCase());
+      const h1 = rawLines[1].split(',').map(s => s.trim().toLowerCase());
+
+      function findCol(terms, groupTerms) {
+        if (groupTerms && groupTerms.length > 0) {
+          for (let i = 0; i < h1.length; i++) {
+            const gMatch = groupTerms.some(g => (h0[i] || '').includes(g));
+            const cMatch = terms.some(t => (h1[i] || '').includes(t));
+            if (gMatch && cMatch) return i;
+          }
+        }
+        for (let i = 0; i < h1.length; i++) {
+          if (terms.some(t => (h1[i] || '').includes(t))) return i;
+        }
+        for (let i = 0; i < h0.length; i++) {
+          if (terms.some(t => (h0[i] || '').includes(t))) return i;
+        }
+        return -1;
+      }
+
+      const colTime = 0;
+      const colTemp = findCol(['temperature'], ['outdoor']);
+      const colFeels = findCol(['feels like'], ['outdoor']);
+      const colDew = findCol(['dew point'], ['outdoor']);
+      const colHum = findCol(['humidity'], ['outdoor']);
+      const colVpd = findCol(['vpd']);
+      const colSolar = findCol(['solar']);
+      const colUvi = findCol(['uvi']);
+      const colRainRate = findCol(['rain rate']);
+      const colDailyRain = findCol(['daily']);
+      const colEventRain = findCol(['event']);
+      const colHourlyRain = findCol(['hourly']);
+      const colRain24h = findCol(['24 hours', '24hours']);
+      const colWeeklyRain = findCol(['weekly']);
+      const colMonthlyRain = findCol(['monthly']);
+      const colYearlyRain = findCol(['yearly']);
+      const colWindSpeed = findCol(['wind speed']);
+      const colWindGust = findCol(['wind gust']);
+      const colWindDir = findCol(['wind direction'], ['wind']);
+      const colBarRel = findCol(['relative'], ['pressure']);
+      const colBarAbs = findCol(['absolute'], ['pressure']);
 
       const dataRows = [];
       const numOrNull = (val) => {
@@ -772,9 +817,9 @@
 
       for (let i = 2; i < rawLines.length; i++) {
         const parts = rawLines[i].split(',');
-        if (parts.length < 15) continue;
+        if (parts.length < 5) continue;
 
-        const timeFull = parts[0] ? parts[0].trim() : '';
+        const timeFull = parts[colTime] ? parts[colTime].trim() : '';
         const timeParts = timeFull.split(' ');
         const dateStr = timeParts[0] || '';
         const timeStr = timeParts[1] ? timeParts[1].substring(0, 5) : '';
@@ -783,26 +828,26 @@
           dateTime: timeFull,
           dateStr: dateStr,
           timeStr: timeStr,
-          temp: numOrNull(parts[1]),             // Outdoor Temperature (°C)
-          feelsLike: numOrNull(parts[2]),        // Outdoor Feels Like (°C)
-          dewPoint: numOrNull(parts[3]),         // Outdoor Dew Point (°C)
-          hum: numOrNull(parts[4]),              // Outdoor Humidity (%)
-          vpd: numOrNull(parts[5]),              // Outdoor VPD (kPa)
-          solar: numOrNull(parts[10]),           // Solar (W/m²)
-          uvi: numOrNull(parts[11]),             // UVI
-          rainRate: numOrNull(parts[12]),        // Rain Rate (mm/hr)
-          dailyRain: numOrNull(parts[13]),       // Daily Rain (mm)
-          eventRain: numOrNull(parts[14]),       // Event Rain (mm)
-          hourlyRain: numOrNull(parts[15]),      // Hourly Rain (mm)
-          rain24h: numOrNull(parts[16]),         // 24 Hours Rain (mm)
-          weeklyRain: numOrNull(parts[17]),      // Weekly Rain (mm)
-          monthlyRain: numOrNull(parts[18]),     // Monthly Rain (mm)
-          yearlyRain: numOrNull(parts[19]),      // Yearly Rain (mm)
-          windSpeed: numOrNull(parts[20]),       // Wind Speed (km/h)
-          windGust: numOrNull(parts[21]),        // Wind Gust (km/h)
-          windDir: numOrNull(parts[22]),         // Wind Direction (°)
-          windDirAvg: numOrNull(parts[23]),      // 10-min Avg Direction (°)
-          barRel: numOrNull(parts[24])           // Relative Pressure (hPa)
+          temp: colTemp >= 0 ? numOrNull(parts[colTemp]) : null,
+          feelsLike: colFeels >= 0 ? numOrNull(parts[colFeels]) : null,
+          dewPoint: colDew >= 0 ? numOrNull(parts[colDew]) : null,
+          hum: colHum >= 0 ? numOrNull(parts[colHum]) : null,
+          vpd: colVpd >= 0 ? numOrNull(parts[colVpd]) : null,
+          solar: colSolar >= 0 ? numOrNull(parts[colSolar]) : null,
+          uvi: colUvi >= 0 ? numOrNull(parts[colUvi]) : null,
+          rainRate: colRainRate >= 0 ? numOrNull(parts[colRainRate]) : 0,
+          dailyRain: colDailyRain >= 0 ? numOrNull(parts[colDailyRain]) : 0,
+          eventRain: colEventRain >= 0 ? numOrNull(parts[colEventRain]) : 0,
+          hourlyRain: colHourlyRain >= 0 ? numOrNull(parts[colHourlyRain]) : 0,
+          rain24h: colRain24h >= 0 ? numOrNull(parts[colRain24h]) : 0,
+          weeklyRain: colWeeklyRain >= 0 ? numOrNull(parts[colWeeklyRain]) : null,
+          monthlyRain: colMonthlyRain >= 0 ? numOrNull(parts[colMonthlyRain]) : null,
+          yearlyRain: colYearlyRain >= 0 ? numOrNull(parts[colYearlyRain]) : null,
+          windSpeed: colWindSpeed >= 0 ? numOrNull(parts[colWindSpeed]) : 0,
+          windGust: colWindGust >= 0 ? numOrNull(parts[colWindGust]) : 0,
+          windDir: colWindDir >= 0 ? numOrNull(parts[colWindDir]) : 0,
+          barRel: colBarRel >= 0 ? numOrNull(parts[colBarRel]) : null,
+          barAbs: colBarAbs >= 0 ? numOrNull(parts[colBarAbs]) : null
         });
       }
       return dataRows;
@@ -1319,12 +1364,13 @@
       if (!ctx) return;
       const { textColor, gridColor } = getChartColors();
       const labels = rows.map(r => r.timeStr);
-      const rains = rows.map(r => r.hourlyRain !== null ? r.hourlyRain : (r.dailyRain !== null ? r.dailyRain : 0));
-      const rates = rows.map(r => r.rainRate || 0);
+      // Se grafica la lluvia de cada período (mm) sin mezclar con el acumulado diario
+      const rains = rows.map(r => (r.hourlyRain !== null && r.hourlyRain > 0) ? r.hourlyRain : 0);
+      const rates = rows.map(r => (r.rainRate !== null && r.rainRate > 0) ? r.rainRate : 0);
 
       const latestDaily = rows.map(r => r.dailyRain).filter(v => v !== null).pop() || 0;
       const badge = document.getElementById('badge-rain-val');
-      if (badge) badge.innerText = `${latestDaily.toFixed(1)} mm día`;
+      if (badge) badge.innerText = `${latestDaily.toFixed(1)} mm acum. hoy`;
 
       if (chartLluvia) chartLluvia.destroy();
       chartLluvia = new Chart(ctx, {
