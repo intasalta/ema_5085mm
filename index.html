@@ -144,24 +144,7 @@
           </button>
         </div>
 
-        <!-- Indicador solar / astronómico -->
-        <div class="hidden lg:flex items-center gap-4 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
-          <div class="flex items-center gap-1.5">
-            <i data-feather="sun" class="h-4 w-4 text-amber-500"></i>
-            <div>
-              <p class="text-[9px] uppercase font-bold text-slate-400">Rad. Solar</p>
-              <p id="badge-solar-top" class="font-bold text-slate-700 dark:text-slate-200">-- W/m²</p>
-            </div>
-          </div>
-          <div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
-          <div class="flex items-center gap-1.5">
-            <i data-feather="zap" class="h-4 w-4 text-violet-500"></i>
-            <div>
-              <p class="text-[9px] uppercase font-bold text-slate-400">Índice UVI</p>
-              <p id="badge-uvi-top" class="font-bold text-slate-700 dark:text-slate-200">--</p>
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -196,10 +179,6 @@
                 <td class="py-1">A hs:</td>
                 <td id="table-temp-min-time" class="py-1 text-center">--:--</td>
                 <td id="table-temp-max-time" class="py-1 text-center">--:--</td>
-              </tr>
-              <tr>
-                <td class="py-2 font-medium">Interior</td>
-                <td id="table-temp-in" colspan="2" class="py-2 text-center text-slate-600 dark:text-slate-300 font-semibold">--°C</td>
               </tr>
             </tbody>
           </table>
@@ -247,10 +226,6 @@
                 <td class="py-1">A hs:</td>
                 <td id="table-hum-min-time" class="py-1 text-center">--:--</td>
                 <td id="table-hum-max-time" class="py-1 text-center">--:--</td>
-              </tr>
-              <tr>
-                <td class="py-2 font-medium">Interior</td>
-                <td id="table-hum-in" colspan="2" class="py-2 text-center text-slate-600 dark:text-slate-300 font-semibold">--%</td>
               </tr>
             </tbody>
           </table>
@@ -964,10 +939,6 @@
         if (elMinTTime) elMinTTime.innerText = minT.timeStr;
         if (elMaxTTime) elMaxTTime.innerText = maxT.timeStr;
       }
-      const elTempIn = document.getElementById('table-temp-in');
-      if (elTempIn && latest.indoorTemp !== null) {
-        elTempIn.innerText = `${latest.indoorTemp.toFixed(1)}°C`;
-      }
 
       // 6.2 Humedad
       const cardHum = document.getElementById('card-hum-val');
@@ -989,10 +960,6 @@
         if (elMaxH) elMaxH.innerText = `${Math.round(maxH.hum)}%`;
         if (elMinHTime) elMinHTime.innerText = minH.timeStr;
         if (elMaxHTime) elMaxHTime.innerText = maxH.timeStr;
-      }
-      const elHumIn = document.getElementById('table-hum-in');
-      if (elHumIn && latest.indoorHum !== null) {
-        elHumIn.innerText = `${Math.round(latest.indoorHum)}%`;
       }
 
       // 6.3 Sensación Térmica, Punto de Rocío y VPD
@@ -1037,11 +1004,9 @@
 
       // 6.5 Radiación Solar & UV
       const elSolarCur = document.getElementById('solar-cur-val');
-      const elSolarTop = document.getElementById('badge-solar-top');
       if (latest.solar !== null) {
         const solVal = `${Math.round(latest.solar)} W/m²`;
         if (elSolarCur) elSolarCur.innerText = solVal;
-        if (elSolarTop) elSolarTop.innerText = solVal;
       }
       const solars24 = ultimas24.map(r => r.solar).filter(v => v !== null);
       if (solars24.length > 0) {
@@ -1051,12 +1016,10 @@
       }
 
       const elUviCur = document.getElementById('uvi-cur-val');
-      const elUviTop = document.getElementById('badge-uvi-top');
       const elUviDesc = document.getElementById('uvi-desc-val');
       if (latest.uvi !== null) {
         const uviVal = latest.uvi.toString();
         if (elUviCur) elUviCur.innerText = uviVal;
-        if (elUviTop) elUviTop.innerText = uviVal;
         if (elUviDesc) {
           const u = parseFloat(latest.uvi);
           if (u <= 2) { elUviDesc.innerText = 'Bajo'; elUviDesc.className = 'text-[11px] px-2 py-0.5 rounded-md font-semibold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'; }
