@@ -87,11 +87,6 @@
               <i data-feather="home" class="h-3.5 w-3.5"></i> Red EMAS INTA
             </a>
 
-            <!-- Acceso Directo al Panel Público Oficial de Ecowitt (Sin Login) -->
-            <a href="https://www.ecowitt.net/home/share?authorize=5MMNHG&device_id=YkliaG1nckQ4RFlBZWE5YWFRWEMrZz09" target="_blank" rel="noopener" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-semibold transition-all shadow-sm" title="Abrir panel oficial en vivo en Ecowitt sin iniciar sesión">
-              <i data-feather="external-link" class="h-3.5 w-3.5 text-amber-300"></i> Panel Ecowitt Oficial (En Vivo)
-            </a>
-
             <!-- Descarga de datos XLS diarios -->
             <a id="btn-download-xls" href="https://raw.githubusercontent.com/intasalta/daza/main/364053_daily_station_data.xls" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-semibold transition-all shadow-sm" title="Descargar datos diarios en formato XLS">
               <i data-feather="download" class="h-3.5 w-3.5 text-emerald-300"></i> Descargar Datos (XLS)
@@ -149,9 +144,10 @@
         </div>
 
         <!-- Botón de acceso directo al servidor oficial Ecowitt -->
-        <a href="https://www.ecowitt.net/home/share?authorize=5MMNHG&device_id=YkliaG1nckQ4RFlBZWE5YWFRWEMrZz09" target="_blank" rel="noopener" class="hidden md:flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-feather="wifi" class="h-4 w-4 text-emerald-500"></i>
-          <span class="font-medium">Servidor Ecowitt Conectado</span>
+        <a href="https://www.ecowitt.net/home/share?authorize=5MMNHG&device_id=YkliaG1nckQ4RFlBZWE5YWFRWEMrZz09" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 rounded-xl border border-emerald-500/30 transition shadow-sm font-semibold" title="Abrir panel oficial en vivo en Ecowitt sin iniciar sesión">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <i data-feather="wifi" class="h-3.5 w-3.5 text-emerald-500"></i>
+          <span>Servidor Ecowitt Conectado</span>
         </a>
       </div>
     </div>
@@ -606,15 +602,10 @@
 
     </div>
 
-    <!-- ADVERTENCIA DE SERVICIO Y ENLACES DIRECTOS -->
-    <div class="bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/50 text-sky-900 dark:text-sky-300 p-4 rounded-2xl text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <i data-feather="info" class="h-5 w-5 text-sky-600 dark:text-sky-400 shrink-0"></i>
-        <p>Panel integrado con acceso directo a la estación meteorológica Ecowitt del Colegio Secundario N° 5085 "Dr. Mariano Moreno" (Gral. Güemes, Salta).</p>
-      </div>
-      <a href="https://www.ecowitt.net/home/share?authorize=5MMNHG&device_id=YkliaG1nckQ4RFlBZWE5YWFRWEMrZz09" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-semibold hover:bg-sky-500 transition shrink-0 flex items-center gap-1.5 shadow-sm">
-        <i data-feather="external-link" class="h-3.5 w-3.5"></i> Ver Panel Ecowitt Oficial
-      </a>
+    <!-- ADVERTENCIA DE SERVICIO -->
+    <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-2xl text-xs flex items-center gap-3">
+      <i data-feather="alert-circle" class="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0"></i>
+      <p>Este panel lee automáticamente los datos climáticos actualizados desde el repositorio oficial de la estación en GitHub. Los datos pueden actualizarse con un pequeño retraso dependiendo de la conectividad local.</p>
     </div>
 
   </main>
